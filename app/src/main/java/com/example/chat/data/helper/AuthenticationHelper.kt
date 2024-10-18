@@ -3,6 +3,8 @@ package com.example.chat.data.helper
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
 
 class AuthenticationHelper {
@@ -10,7 +12,7 @@ class AuthenticationHelper {
         val authenticationHelper = AuthenticationHelper()
     }
     private val authentication = FirebaseAuth.getInstance()
-    private var user = authentication.currentUser
+    var user : FirebaseUser?=null
     suspend fun signUp(email:String, password:String): String? {
         var msg: String? = null
         try {
@@ -19,7 +21,9 @@ class AuthenticationHelper {
             }.addOnFailureListener {
                 msg = it.message
             }.await()
-        }catch (e:FirebaseAuthException){
+        }catch (fb:FirebaseAuthUserCollisionException){
+            msg = "Email Already Registered"
+        }catch (e:FirebaseAuthException) {
             msg = "Please enter valid Email Id or Password"
         }
         Log.d("TAG", "signUp: ======================================$msg")

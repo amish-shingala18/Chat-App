@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.chat.R
+import com.example.chat.data.helper.AuthenticationHelper.Companion.authenticationHelper
+import com.example.chat.data.model.UserModel
 import com.example.chat.databinding.ActivitySignUpBinding
 import com.example.chat.viewmodel.UserViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -54,10 +56,19 @@ class SignUpActivity : AppCompatActivity() {
                 binding.txtSignUpPasswordLayout.error="Please Enter Password"
             } else{
                 GlobalScope.launch {
-                    Log.d("TAG", "initClick: ===========$signUpEmail =========$signUpPassword")
                     val signUpResult = userViewModel.getSignUp(signUpEmail, signUpPassword)
+                    Log.d("TAG", "initClick: ===========$signUpEmail =========$signUpPassword")
                     withContext(Dispatchers.Main) {
+                        Log.d("TAG", "initClick: ============$signUpResult")
                         if (signUpResult == "Success") {
+                            authenticationHelper.checkUser()
+                            userViewModel.insertUserData(
+                                UserModel(firstName = signUpFN,
+                                    lastName = signUpLN,
+                                    email = signUpEmail,
+                                    mobile = signUpMN,
+                                    uid = authenticationHelper.user!!.uid)
+                            )
                             Toast.makeText(
                                 this@SignUpActivity,
                                 "Email Registered Successfully",
