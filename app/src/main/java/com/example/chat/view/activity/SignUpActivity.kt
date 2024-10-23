@@ -33,7 +33,6 @@ class SignUpActivity : AppCompatActivity() {
         }
         initClick()
     }
-
     @OptIn(DelicateCoroutinesApi::class)
     private fun initClick() {
         binding.btnSignUp.setOnClickListener {
@@ -76,7 +75,10 @@ class SignUpActivity : AppCompatActivity() {
                             ).show()
                             finish()
                         } else {
-                            Toast.makeText(this@SignUpActivity, signUpResult, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@SignUpActivity,
+                                signUpResult,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }

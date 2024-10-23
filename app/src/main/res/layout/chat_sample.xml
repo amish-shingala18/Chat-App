@@ -2,49 +2,43 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/lnrChat"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center"
-    android:id="@+id/lnrChat">
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvOppChat"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="10dp"
-        android:visibility="visible"
-        app:cardCornerRadius="360dp">
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    android:gravity="end">
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/gradient"/>
-    </androidx.cardview.widget.CardView>
-
-
-    <TextView
-        android:id="@+id/txtSampleMessage"
+    <LinearLayout
+        android:id="@+id/lnrBgChats"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:padding="10dp"
-        android:text="Gemini Ai"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="2dp">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvUser"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="10dp"
-        android:visibility="visible"
-        app:cardCornerRadius="360dp">
+        <TextView
+            android:id="@+id/txtSampleMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:text="Gemini Ai"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/gradient"/>
-    </androidx.cardview.widget.CardView>
+        <TextView
+            android:id="@+id/txtSampleChatTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="2dp"
+            android:text="time"
+            android:textColor="#757575"
+            android:textSize="8sp" />
+    </LinearLayout>
+
 </LinearLayout>

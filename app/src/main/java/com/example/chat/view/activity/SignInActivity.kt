@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.chat.view.activity
 
 import android.content.Intent
@@ -11,8 +13,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.chat.R
 import com.example.chat.data.helper.AuthenticationHelper.Companion.authenticationHelper
-import com.example.chat.data.helper.DBHelper.Companion.dbHelper
-import com.example.chat.data.model.UserModel
 import com.example.chat.databinding.ActivitySignInBinding
 import com.example.chat.viewmodel.UserViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -41,19 +41,20 @@ class SignInActivity : AppCompatActivity() {
         }
         initClick()
         googleSignIn()
-        val registerGoogle = registerForActivityResult(ActivityResultContracts.StartActivityForResult(),{
+        val registerGoogle = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val googleId = GoogleSignIn.getSignedInAccountFromIntent(it.data)
-            val credential = GoogleAuthProvider.getCredential(googleId.result.idToken,null)
+            val credential = GoogleAuthProvider.getCredential(googleId.result.idToken, null)
             FirebaseAuth.getInstance().signInWithCredential(credential).addOnSuccessListener {
                 authenticationHelper.checkUser()
                 val intent = Intent(this@SignInActivity, ProfileActivity::class.java)
-                intent.putExtra("email",googleId.result.email)
+                intent.putExtra("email", googleId.result.email)
                 startActivity(intent)
                 finish()
-            }.addOnFailureListener{
-                Toast.makeText(this@SignInActivity, "something went wrong!!", Toast.LENGTH_SHORT).show()
+            }.addOnFailureListener {
+                Toast.makeText(this@SignInActivity, "something went wrong!!", Toast.LENGTH_SHORT)
+                    .show()
             }
-        })
+        }
         binding.lnrGoogleSignIn.setOnClickListener {
             val intent = googleClient.signInIntent
             registerGoogle.launch(intent)

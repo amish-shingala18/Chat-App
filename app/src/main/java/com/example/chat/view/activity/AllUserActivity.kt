@@ -31,6 +31,7 @@ class AllUserActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        initClick()
         userViewModel.readAllUsers()
         allUserAdapter=AllUserAdapter(allUserList)
         binding.rvAllUsers.adapter = allUserAdapter
@@ -40,6 +41,11 @@ class AllUserActivity : AppCompatActivity() {
                     allUserAdapter.dataSetChanged(it)
                 }
             }
+        }
+    }
+    private fun initClick(){
+        binding.imgAllUsersBack.setOnClickListener {
+            finish()
         }
     }
 }

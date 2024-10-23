@@ -2,6 +2,7 @@ package com.example.chat.view.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -21,20 +22,28 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding=ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        userViewModel.readUserData()
-        userViewModel.liveModel.observe(this) {
-            val email = intent.getStringExtra("email")
-            binding.edtProfileEmail.setText(email)
-            if (it!=null) {
-                binding.edtProfileFN.setText(it.firstName)
-                binding.edtProfileLN.setText(it.lastName)
-                binding.edtProfileMN.setText(it.mobile)
-            }
-        }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+        val email = intent.getStringExtra("email")
+        Log.d("TAG", "onCreate: ProfileActivity====================== $email ")
+        binding.edtProfileEmail.setText(email)
+        userViewModel.readUserData()
+        userViewModel.liveModel.observe(this) {
+            if (it.firstName==null) {
+                binding.edtProfileFN.setText("")
+            } else if(it.lastName==null){
+                binding.edtProfileLN.setText("")
+            }else if(it.mobile==null){
+                binding.edtProfileMN.setText("")
+            }
+            else {
+                binding.edtProfileFN.setText(it.firstName)
+                binding.edtProfileLN.setText(it.lastName)
+                binding.edtProfileMN.setText(it.mobile)
+            }
         }
         initClick()
     }

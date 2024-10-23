@@ -60,7 +60,7 @@
             android:layout_marginEnd="8dp"
             android:text="last message"
             android:textColor="@color/black"
-            android:visibility="visible" />
+            android:visibility="gone" />
     </LinearLayout>
 
     <TextView
@@ -71,6 +71,7 @@
         android:layout_marginEnd="16dp"
         android:text="09:41"
         android:textColor="@color/black"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/lnrChatName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/lnrChatName"

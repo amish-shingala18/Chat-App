@@ -29,13 +29,13 @@ class SplashActivity : AppCompatActivity() {
         }
         authenticationHelper.checkUser()
         Handler(Looper.getMainLooper()).postDelayed({
-            if (authenticationHelper.user != null) {
+            if (authenticationHelper.user!=null) {
                 startActivity(Intent(this@SplashActivity, MainActivity::class.java))
             } else {
                 startActivity(Intent(this@SplashActivity, LoginOptionActivity::class.java))
             }
             Log.d("TAG", "onCreate: ========${authenticationHelper.checkUser()} ================${authenticationHelper.user}")
-        },3000)
+        },5000)
         finish()
     }
 }
