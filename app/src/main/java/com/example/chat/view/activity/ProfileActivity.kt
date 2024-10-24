@@ -32,14 +32,7 @@ class ProfileActivity : AppCompatActivity() {
         binding.edtProfileEmail.setText(email)
         userViewModel.readUserData()
         userViewModel.liveModel.observe(this) {
-            if (it.firstName==null) {
-                binding.edtProfileFN.setText("")
-            } else if(it.lastName==null){
-                binding.edtProfileLN.setText("")
-            }else if(it.mobile==null){
-                binding.edtProfileMN.setText("")
-            }
-            else {
+            if (it.firstName!=null) {
                 binding.edtProfileFN.setText(it.firstName)
                 binding.edtProfileLN.setText(it.lastName)
                 binding.edtProfileMN.setText(it.mobile)
@@ -64,7 +57,7 @@ class ProfileActivity : AppCompatActivity() {
             }else if(email.isEmpty()){
                 binding.txtEmailProfileLayout.error="Please enter email address"
             }else{
-                dbHelper.insertUserData(UserModel(firstName = fn,
+                userViewModel.insertUserData(UserModel(firstName = fn,
                     lastName = ln,
                     mobile = mn,
                     email = email,

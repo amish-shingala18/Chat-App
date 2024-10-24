@@ -50,7 +50,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
-    implementation(libs.play.services.auth)
+    implementation("com.google.android.gms:play-services-auth:21.0.1")
     implementation (libs.androidx.credentials)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)

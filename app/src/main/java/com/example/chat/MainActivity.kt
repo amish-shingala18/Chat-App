@@ -26,7 +26,7 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var filterList: MutableList<ChatDocModel>
+    private var filterList= mutableListOf<ChatDocModel>()
     //    private var filterList= mutableListOf<ChatDocModel>()
     private lateinit var binding:ActivityMainBinding
     private lateinit var userAdapter: UserAdapter
@@ -55,8 +55,6 @@ class MainActivity : AppCompatActivity() {
     }
     private fun initClick() {
         binding.imgMenu.setOnClickListener {
-//            authenticationHelper.logout()
-//            startActivity(Intent(this@MainActivity, LoginOptionActivity::class.java))
             val popupMenu = PopupMenu(this@MainActivity,binding.imgMenu)
             popupMenu.menuInflater.inflate(R.menu.pop_up_menu,popupMenu.menu)
             popupMenu.setOnMenuItemClickListener {
@@ -82,19 +80,21 @@ class MainActivity : AppCompatActivity() {
         binding.fabAllUsers.setOnClickListener {
             startActivity(Intent(this@MainActivity,AllUserActivity::class.java))
         }
-        binding.svChatUsers.setOnQueryTextListener(object : OnQueryTextListener,
-            SearchView.OnQueryTextListener {
+        binding.svChatUsers.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
             override fun onQueryTextChange(newText: String?): Boolean {
                 filterList = userList.filter { chatDocModel ->
-                    chatDocModel.uid1["name"]!!.lowercase().contains(newText!!.lowercase(Locale.getDefault()))
-                            || chatDocModel.uid2["name"]!!.lowercase().contains(newText.lowercase(Locale.getDefault()))
+                    val name1 = chatDocModel.uid1["name"]?.lowercase() ?: ""
+                    val name2 = chatDocModel.uid2["name"]?.lowercase() ?: ""
+                    name1.contains(newText!!.lowercase(Locale.getDefault())) ||
+                            name2.contains(newText.lowercase(Locale.getDefault()))
                 }.toMutableList()
                 userAdapter.search(filterList)
-                return false
+                return true
             }
         })
+
     }
 }

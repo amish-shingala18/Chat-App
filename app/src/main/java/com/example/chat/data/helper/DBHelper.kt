@@ -121,7 +121,6 @@ class DBHelper {
         val docId: String?
         val docs = checkChatDoc(clientId)
         if (docs!!.documents.size == 0) {
-            //create new chat
             val docRef = userStore.collection("chats")
                 .add(docModel).await()
             docId = docRef.id

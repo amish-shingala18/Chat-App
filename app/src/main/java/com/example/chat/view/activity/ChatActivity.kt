@@ -49,7 +49,7 @@ class ChatActivity : AppCompatActivity() {
         readMessage(userViewModel)
         binding.imgSend.setOnClickListener {
             val messageText = binding.edtSendMessage.text.toString()
-            val sdf = SimpleDateFormat("hh:mm")
+            val sdf = SimpleDateFormat("dd/MM/yy HH:mm:ss")
             val currentTime = sdf.format(System.currentTimeMillis())
             if (messageText.isNotEmpty()) {
                 userViewModel.sendMessage(
