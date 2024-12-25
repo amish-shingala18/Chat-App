@@ -2,20 +2,19 @@ package com.example.chat.view.adapter
 
 
 import android.annotation.SuppressLint
-import android.print.PrintAttributes.Margins
+import android.app.Dialog
+import android.graphics.drawable.ColorDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.marginStart
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chat.R
 import com.example.chat.data.helper.AuthenticationHelper.Companion.authenticationHelper
 import com.example.chat.data.model.MessageModel
 import com.example.chat.databinding.ChatSampleBinding
-import com.google.firebase.database.collection.LLRBNode.Color
 
-class ChatAdapter(private var list : List<MessageModel>) : RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
+class ChatAdapter(private var list: List<MessageModel>,val chatAction: ChatActionInterFace) : RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
     class ChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val sampleBinding = ChatSampleBinding.bind(itemView)
     }
@@ -51,5 +50,22 @@ class ChatAdapter(private var list : List<MessageModel>) : RecyclerView.Adapter<
             params.setMargins(0, 0, 108, 0)
             holder.sampleBinding.lnrBgChats.layoutParams = params
         }
+        holder.sampleBinding.lnrChat.setOnLongClickListener {
+            val dialog = Dialog(holder.sampleBinding.lnrChat.context)
+            dialog.setContentView(R.layout.delete_msg)
+            dialog.window!!.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+            dialog.show()
+            dialog.findViewById<View>(R.id.btnDeleteMessage).setOnClickListener {
+                chatAction.deleteMessage(list[position].docId)
+                dialog.dismiss()
+            }
+            dialog.findViewById<View>(R.id.btnCancel).setOnClickListener {
+                dialog.dismiss()
+            }
+            true
+        }
     }
+}
+interface ChatActionInterFace {
+    fun deleteMessage(docId:String)
 }

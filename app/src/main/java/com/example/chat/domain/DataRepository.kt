@@ -19,4 +19,5 @@ class DataRepository {
     suspend fun sendMessage(clientId:String, model: MessageModel, docModel: ChatDocModel):Int = dbHelper.sendMessage(clientId,model,docModel)
     fun readMessage(uids:String): Flow<MutableList<MessageModel>> = dbHelper.readMessage(uids)
     fun checkChatUsers(): Flow<MutableList<ChatDocModel>> = dbHelper.checkChatUsers()
+    fun deleteMessage(docId:String) = dbHelper.deleteMessage(docId)
 }

@@ -12,31 +12,29 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-
 @Suppress("NAME_SHADOWING", "NAME_SHADOWING", "NAME_SHADOWING", "UNCHECKED_CAST")
 class DBHelper {
     companion object {
         val dbHelper = DBHelper()
     }
-
+    private var docIDs: QuerySnapshot? = null
     private val userStore = FirebaseFirestore.getInstance()
     fun insertUserData(userModel: UserModel) {
         userStore.collection("users")
             .document(authenticationHelper.user!!.uid)
             .set(userModel)
     }
-
     suspend fun readUserData(): UserModel {
-        val doc = userStore
-            .collection("users")
-            .document(authenticationHelper.user!!.uid)
-            .get().await()
+        val doc =
+            userStore.collection("users")
+                .document(authenticationHelper.user!!.uid)
+                .get().await()
         val userGetData = doc.data
-        val email = userGetData?.get("email")
-        val firstName = userGetData?.get("firstName")
-        val lastName = userGetData?.get("lastName")
-        val mobile = userGetData?.get("mobile")
-        val uid = userGetData?.get("uid")
+        val email = userGetData?.get("email") ?: ""
+        val firstName = userGetData?.get("firstName") ?: ""
+        val lastName = userGetData?.get("lastName") ?: ""
+        val mobile = userGetData?.get("mobile") ?: ""
+        val uid = userGetData?.get("uid") ?: ""
         return UserModel(
             email = email.toString(),
             firstName = firstName.toString(),
@@ -45,40 +43,39 @@ class DBHelper {
             uid = uid.toString()
         )
     }
-
     fun readAllUsers(): Flow<MutableList<UserModel>> {
         return callbackFlow {
-            val snapshot = userStore.collection("users")
-                .whereNotEqualTo("uid", authenticationHelper.user?.uid)
-                .addSnapshotListener { value, error ->
-                    if (value != null) {
-                        val userList = mutableListOf<UserModel>()
-                        for (x in value.documents) {
-                            val userModel = UserModel(
-                                firstName = x["firstName"].toString(),
-                                lastName = x["lastName"].toString(),
-                                email = x["email"].toString(),
-                                mobile = x["mobile"].toString(),
-                                uid = x["uid"].toString()
-                            )
-                            userList.add(userModel)
+            val snapshot =
+                userStore.collection("users")
+                    .whereNotEqualTo("uid", authenticationHelper.user?.uid)
+                    .addSnapshotListener { value, error ->
+                        if (value != null) {
+                            val userList = mutableListOf<UserModel>()
+                            for (x in value.documents) {
+                                val userModel = UserModel(
+                                    firstName = x["firstName"].toString(),
+                                    lastName = x["lastName"].toString(),
+                                    email = x["email"].toString(),
+                                    mobile = x["mobile"].toString(),
+                                    uid = x["uid"].toString()
+                                )
+                                userList.add(userModel)
+                            }
+                            trySend(userList)
+                        } else {
+                            close(error!!)
                         }
-                        trySend(userList)
-                    } else {
-                        close(error!!)
                     }
-                }
             awaitClose {
                 snapshot.remove()
             }
         }
     }
-
     private suspend fun checkChatDoc(clientUid: String): QuerySnapshot? {
         val docs = userStore.collection("chats")
-            .whereEqualTo("uids", listOf(authenticationHelper.user!!.uid, clientUid))
+            .whereEqualTo("uids",listOf(authenticationHelper.user!!.uid, clientUid))
             .get().await()
-        if (docs.documents.size == 0) {
+        if (docs.documents.size==0) {
             val docs = userStore.collection("chats")
                 .whereEqualTo("uids", listOf(clientUid, authenticationHelper.user!!.uid))
                 .get().await()
@@ -87,10 +84,9 @@ class DBHelper {
         return docs
     }
     fun checkChatUsers(): Flow<MutableList<ChatDocModel>> {
-        Log.e("TAG", "checkChatUsers: ${authenticationHelper.user!!.uid}")
         return callbackFlow {
             val doc = userStore.collection("chats").get().await()
-            if (doc!=null) {
+            if (doc != null) {
                 val snapshot = userStore.collection("chats")
                     .whereArrayContains("uids", authenticationHelper.user!!.uid)
                     .addSnapshotListener { value, error ->
@@ -98,8 +94,8 @@ class DBHelper {
                         if (value != null) {
                             for (x in value.documents) {
                                 val uids = x["uids"] as MutableList<String>
-                                val uid1 = x["uid1"] as MutableMap<String, String>
-                                val uid2 = x["uid2"] as MutableMap<String, String>
+                                val uid1 = x["uid1"] as MutableMap<String, Any>
+                                val uid2 = x["uid2"] as MutableMap<String, Any>
 
                                 val model = ChatDocModel(uid1 = uid1, uid2 = uid2, uids = uids)
                                 userList.add(model)
@@ -108,22 +104,48 @@ class DBHelper {
                         } else {
                             close(error)
                         }
-
                     }
                 awaitClose {
                     snapshot.remove()
                 }
             }
         }
-
     }
-    suspend fun sendMessage(clientId: String, model: MessageModel, docModel: ChatDocModel):Int {
+    fun changeStatus( status:Boolean,user:Int) {
+        val docId: String?
+        if (docIDs!!.documents.size == 0) {
+        } else {
+            docId = docIDs!!.documents.last().toString()
+            if(user==1)
+            {
+                userStore.collection("chats")
+                    .document(docId)
+                    .set({"uid1" to {"status" to status}})
+            }
+            else{
+                userStore.collection("chats")
+                    .document(docId)
+                    .set({"uid2" to {"status" to status}})
+            }
+        }
+    }
+    suspend fun sendMessage(clientId: String, model: MessageModel, docModel: ChatDocModel): Int {
         val docId: String?
         val docs = checkChatDoc(clientId)
         if (docs!!.documents.size == 0) {
-            val docRef = userStore.collection("chats")
-                .add(docModel).await()
+            val docRef = userStore.collection("chats").add(docModel).await()
             docId = docRef.id
+
+//            var status1 = mapOf(docModel.uids[0] to false)
+//            var status2 = mapOf(docModel.uids[1] to false)
+
+            // Add Typing Status
+//            userStore.collection("chats")
+//                .document(docId).set(status1).await()
+//            userStore.collection("chats")
+//                .document(docId).set(status2).await()
+
+
             userStore.collection("chats")
                 .document(docId)
                 .collection("msg")
@@ -137,39 +159,48 @@ class DBHelper {
                 .add(model)
             return 1
         }
-
     }
     fun readMessage(uids: String): Flow<MutableList<MessageModel>> {
         return callbackFlow {
-            val docIDs = checkChatDoc(uids)
+            docIDs = checkChatDoc(uids)
             Log.e("Data", "readMessage: ${docIDs!!.documents.size}")
-                val snapshot = docIDs.documents.lastOrNull()?.id?.let {
-                    userStore.collection("chats")
-                        .document(it)
-                        .collection("msg")
-                        .orderBy("dateTime")
-                        .addSnapshotListener { value, error ->
-                            val messageList = mutableListOf<MessageModel>()
-                            if (value != null) {
-                                for (document in value.documents) {
-                                    val messageModel = MessageModel(
-                                        senderUid = document["senderUid"].toString(),
-                                        msg = document["msg"].toString(),
-                                        dateTime = document["dateTime"].toString()
-                                    )
-                                    messageList.add(messageModel)
-                                }
-                                trySend(messageList)
-                            } else {
-                                Log.e("TAG", "readMessage:------------- ${error!!.message} ")
-                                close(error)
+            val snapshot = docIDs!!
+                .documents.lastOrNull()
+                ?.id?.let {
+                userStore.collection("chats")
+                    .document(it).collection("msg")
+                    .orderBy("dateTime")
+                    .addSnapshotListener { value, error ->
+                        val messageList = mutableListOf<MessageModel>()
+                        if (value != null) {
+                            for (document in value.documents) {
+                                val messageModel = MessageModel(
+                                    senderUid = document["senderUid"].toString(),
+                                    msg = document["msg"].toString(),
+                                    dateTime = document["dateTime"].toString(),
+                                    docId = document.id
+                                )
+                                messageList.add(messageModel)
                             }
+                            trySend(messageList)
+                        } else {
+                            Log.e("TAG", "readMessage:------------- ${error!!.message} ")
+                            close(error)
                         }
-                }
-                awaitClose {
-                    snapshot?.remove()
-                }
-
+                    }
+            }
+            awaitClose {
+                snapshot?.remove()
+            }
+        }
+    }
+    fun deleteMessage( docID: String) {
+        docIDs?.documents?.
+        lastOrNull()?.let { userStore.collection("chats")
+                .document(it.id)
+                .collection("msg")
+                .document(docID)
+                .delete()
         }
     }
 }

@@ -17,6 +17,7 @@ import com.example.chat.view.activity.AllUserActivity
 import com.example.chat.view.activity.LoginOptionActivity
 import com.example.chat.view.activity.ProfileActivity
 import com.example.chat.view.adapter.UserAdapter
+import com.example.chat.view.fragment.NetworkFragment
 import com.example.chat.viewmodel.UserViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +28,6 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private var filterList= mutableListOf<ChatDocModel>()
-    //    private var filterList= mutableListOf<ChatDocModel>()
     private lateinit var binding:ActivityMainBinding
     private lateinit var userAdapter: UserAdapter
     private var userList= mutableListOf<ChatDocModel>()
@@ -42,6 +42,15 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+//        (application as ChatNetwork).liveData.observe(this) {
+//            val networkFragment = NetworkFragment()
+//            if (!it) {
+//                networkFragment.isCancelable = false
+//                networkFragment.show(supportFragmentManager, "network")
+//            }else{
+//                networkFragment.dismiss()
+//            }
+//        }
         userAdapter = UserAdapter(userList)
         binding.rvMainUsers.adapter = userAdapter
         initClick()
@@ -86,8 +95,8 @@ class MainActivity : AppCompatActivity() {
             }
             override fun onQueryTextChange(newText: String?): Boolean {
                 filterList = userList.filter { chatDocModel ->
-                    val name1 = chatDocModel.uid1["name"]?.lowercase() ?: ""
-                    val name2 = chatDocModel.uid2["name"]?.lowercase() ?: ""
+                    val name1 = chatDocModel.uid1["name"]?.toString()?.lowercase() ?: ""
+                    val name2 = chatDocModel.uid2["name"]?.toString()?.lowercase() ?: ""
                     name1.contains(newText!!.lowercase(Locale.getDefault())) ||
                             name2.contains(newText.lowercase(Locale.getDefault()))
                 }.toMutableList()
@@ -95,6 +104,5 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
         })
-
     }
 }

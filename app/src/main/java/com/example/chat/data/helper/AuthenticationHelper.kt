@@ -1,6 +1,7 @@
 package com.example.chat.data.helper
 
 import android.util.Log
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
@@ -25,6 +26,10 @@ class AuthenticationHelper {
             msg = "Email Already Registered"
         }catch (e:FirebaseAuthException) {
             msg = "Please enter valid Email Id or Password"
+        }catch (e:FirebaseNetworkException){
+            msg = "Please check your internet connection"
+        }catch(e:Exception){
+            msg = e.message
         }
         Log.d("TAG", "signUp: ======================================$msg")
         return msg
@@ -39,6 +44,10 @@ class AuthenticationHelper {
             }.await()
         }catch (e:FirebaseAuthException){
             msg = "Please enter valid Email Id or Password"
+        }catch (e:FirebaseNetworkException){
+            msg = "Please check your internet connection"
+        }catch(e:Exception){
+            msg = e.message
         }
         Log.d("TAG", "signUp: ======================================$msg")
         return msg

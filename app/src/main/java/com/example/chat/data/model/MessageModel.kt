@@ -4,4 +4,5 @@ data class MessageModel(
     val senderUid: String,
     val dateTime: String,
     val msg: String,
+    val docId:String
 )

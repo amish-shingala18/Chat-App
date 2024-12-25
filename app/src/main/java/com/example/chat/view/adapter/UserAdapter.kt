@@ -18,7 +18,7 @@ class UserAdapter(private var userList: MutableList<ChatDocModel>) :
         val sampleBinding = UserSampleBinding.bind(itemView)
     }
     @SuppressLint("NotifyDataSetChanged")
-    fun search(filterList: List <ChatDocModel>) {
+    fun search(filterList: List <ChatDocModel>){
         userList = filterList.toMutableList()
         notifyDataSetChanged()
     }
@@ -27,42 +27,51 @@ class UserAdapter(private var userList: MutableList<ChatDocModel>) :
         userList = l1
         notifyDataSetChanged()
     }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.user_sample, parent, false)
         return UserViewHolder(view)
     }
-
     override fun getItemCount(): Int {
         return userList.size
     }
-
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         if (userList[position].uid1["uid"] != authenticationHelper.user!!.uid) {
-            holder.sampleBinding.txtSampleName.text = userList[position].uid1["name"]?.substring(0,1)?.uppercase() + userList[position].uid1["name"]?.substring(1)?.lowercase()
+            holder.sampleBinding.txtSampleName.text = userList[position].uid1["name"]?.toString()?.substring(0,1)?.uppercase() + userList[position].uid1["name"]?.toString()?.substring(1)?.lowercase()
             holder.sampleBinding.txtSampleFirstLetter.text =
-                userList[position].uid1["name"]?.get(0).toString()
+                userList[position].uid1["name"]?.toString()?.get(0).toString()
+            holder.sampleBinding.txtSampleLastChat.text = userList[position].uid1["status"].toString()
+//            if(userList[position].uid1["status"] as Boolean)
+//            {
+//                holder.sampleBinding.txtSampleLastChat.text = "typing..."
+//            }
         } else {
-            holder.sampleBinding.txtSampleName.text = userList[position].uid2["name"]?.substring(0,1)?.uppercase() + userList[position].uid2["name"]?.substring(1)?.lowercase()
+            holder.sampleBinding.txtSampleName.text = userList[position].uid2["name"]?.toString()?.substring(0,1)?.uppercase() + userList[position].uid2["name"]?.toString()?.substring(1)?.lowercase()
             holder.sampleBinding.txtSampleFirstLetter.text =
-                userList[position].uid2["name"]?.get(0).toString()
+                userList[position].uid2["name"]?.toString()?.get(0).toString()
+//             if(userList[position].uid2["status"] as Boolean)
+//            {
+//                holder.sampleBinding.txtSampleLastChat.text = "typing..."
+//            }
         }
         holder.sampleBinding.clUsers.setOnClickListener {
             if (userList[position].uid1["uid"] != authenticationHelper.user!!.uid) {
 
                 val intent = Intent(holder.itemView.context, ChatActivity::class.java)
                 intent.putExtra("uid", userList[position].uids[0])
-                intent.putExtra("firstName", userList[position].uid1["name"])
-                intent.putExtra("email", userList[position].uid1["email"])
-                intent.putExtra("mobile", userList[position].uid1["mobile"])
+                intent.putExtra("firstName", userList[position].uid1["name"].toString())
+                intent.putExtra("email", userList[position].uid1["email"].toString())
+                intent.putExtra("mobile", userList[position].uid1["mobile"].toString())
+                intent.putExtra("status", true)
                 holder.itemView.context.startActivity(intent)
             } else{
                 val intent = Intent(holder.itemView.context, ChatActivity::class.java)
                 intent.putExtra("uid", userList[position].uids[1])
-                intent.putExtra("firstName", userList[position].uid2["name"])
-                intent.putExtra("email", userList[position].uid2["email"])
-                intent.putExtra("mobile", userList[position].uid2["mobile"])
+                intent.putExtra("firstName", userList[position].uid2["name"].toString())
+                intent.putExtra("email", userList[position].uid2["email"].toString())
+                intent.putExtra("mobile", userList[position].uid2["mobile"].toString())
+                //intent.putExtra("status", userList[position].uid2["status"])
+                intent.putExtra("status",true)
                 holder.itemView.context.startActivity(intent)
             }
         }

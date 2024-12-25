@@ -2,14 +2,19 @@ package com.example.chat.view.activity
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
+import android.util.TypedValue
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.chat.R
+import com.example.chat.data.helper.DBHelper.Companion.dbHelper
 import com.example.chat.data.model.MessageModel
 import com.example.chat.databinding.ActivityChatBinding
+import com.example.chat.view.adapter.ChatActionInterFace
 import com.example.chat.view.adapter.ChatAdapter
 import com.example.chat.viewmodel.UserViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -20,6 +25,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 
 class ChatActivity : AppCompatActivity() {
+    private var status: Boolean = true
     private lateinit var binding: ActivityChatBinding
     private var clientId: String? = null
     var name: String? = null
@@ -29,7 +35,7 @@ class ChatActivity : AppCompatActivity() {
     private var chatList = mutableListOf<MessageModel>()
 
     @OptIn(DelicateCoroutinesApi::class)
-    @SuppressLint("SimpleDateFormat")
+    @SuppressLint("SimpleDateFormat", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatBinding.inflate(layoutInflater)
@@ -43,12 +49,15 @@ class ChatActivity : AppCompatActivity() {
         getChatUserData()
         Log.d("TAG", "onCreate: -----------$clientId -------- $name ------ $email ------- $mobile")
         initClick()
-        chatAdapter = ChatAdapter(chatList)
-        binding.rvChats.adapter = chatAdapter
+        keyboardStatus()
+        initAdapter(userViewModel)
         Log.d("TAG", "onCreate:-------------=====================-----------------$clientId")
+
         readMessage(userViewModel)
+
         binding.imgSend.setOnClickListener {
             val messageText = binding.edtSendMessage.text.toString()
+            Log.d("TAG", "Sending Message: ============$messageText ")
             val sdf = SimpleDateFormat("dd/MM/yy HH:mm:ss")
             val currentTime = sdf.format(System.currentTimeMillis())
             if (messageText.isNotEmpty()) {
@@ -63,30 +72,72 @@ class ChatActivity : AppCompatActivity() {
                 val messageModel = MessageModel(
                     clientId!!,
                     messageText,
-                    currentTime
+                    currentTime,
+                    docId = clientId!!
                 )
+                Log.d("TAG", "ChatActivity-=-=-=-=-===--====-==--==-==-=$messageModel")
                 chatList.add(messageModel)
                 binding.edtSendMessage.text.clear()
+//                GlobalScope.launch {
+//                    if (userViewModel.newChat == 0) {
+//                      readMessage(userViewModel)
+//                    }
+//                }
+            }
+            if (chatList.isEmpty()) {
                 GlobalScope.launch {
-                    if (userViewModel.newChat == 0) {
-                      readMessage(userViewModel)
-                    }
+                    readMessage(userViewModel)
                 }
             }
         }
     }
+
+    private fun initAdapter(userViewModel: UserViewModel) {
+        val chatAction = object : ChatActionInterFace {
+            override fun deleteMessage(docId: String) {
+                userViewModel.deleteMessage(docId)
+            }
+        }
+        chatAdapter = ChatAdapter(chatList, chatAction)
+        binding.rvChats.adapter = chatAdapter
+    }
+
+    @SuppressLint("SetTextI18n")
     @OptIn(DelicateCoroutinesApi::class)
-    private fun readMessage(userViewModel: UserViewModel){
+    private fun keyboardStatus() {
+        binding.main.getViewTreeObserver()
+            .addOnGlobalLayoutListener {
+                val heightDiff: Int =
+                    binding.main.getRootView().height - binding.main.height
+                if (heightDiff > dpToPx1(200f)) {
+                    GlobalScope.launch {
+                        dbHelper.changeStatus(status, 2)
+                        withContext(Dispatchers.Main) {
+                            binding.txtTypeOrOnline.text = "typing..."
+                            binding.txtTypeOrOnline.visibility = View.VISIBLE
+                        }
+                    }
+                } else {
+                    binding.txtTypeOrOnline.text = " "
+                    binding.txtTypeOrOnline.visibility = View.GONE
+                }
+            }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun readMessage(userViewModel: UserViewModel) {
         GlobalScope.launch {
             userViewModel.readMessage(clientId!!)
             withContext(Dispatchers.Main) {
                 userViewModel.chatsList.collect {
                     Log.d("TAG", "onCreate:===========$it")
                     chatAdapter.dataChanged(it)
+                    binding.rvChats.scrollToPosition(it.size - 1)
                 }
             }
         }
     }
+
     @SuppressLint("SetTextI18n")
     fun getChatUserData() {
         binding.txtChatUserName.text = "${intent.getStringExtra("firstName")}"
@@ -95,10 +146,17 @@ class ChatActivity : AppCompatActivity() {
         name = intent.getStringExtra("firstName")
         email = intent.getStringExtra("email")
         mobile = intent.getStringExtra("mobile")
+        status = intent.getBooleanExtra("status", false)
     }
+
     private fun initClick() {
         binding.imgBack.setOnClickListener {
             finish()
         }
+    }
+
+    private fun dpToPx1(valueInDp: Float): Float {
+        val metrics: DisplayMetrics = getResources().displayMetrics
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics)
     }
 }

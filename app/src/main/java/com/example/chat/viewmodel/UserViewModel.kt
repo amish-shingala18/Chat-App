@@ -60,16 +60,18 @@ class UserViewModel: ViewModel() {
                     getName:String,
                     getMobile:String) {
         viewModelScope.launch {
-            val uid1 = mutableMapOf<String, String>()
+            val uid1 = mutableMapOf<String, Any>()
             uid1["email"] = authenticationHelper.user!!.email!!
-            uid1["name"] = repository.readUserData().firstName +""+ repository.readUserData().lastName
+            uid1["name"] = repository.readUserData().firstName +" "+ repository.readUserData().lastName
             uid1["mobile"] = repository.readUserData().mobile
             uid1["uid"] = repository.readUserData().uid
-            val uid2 = mutableMapOf<String, String>()
+            uid1["status"] = false
+            val uid2 = mutableMapOf<String, Any>()
             uid2["email"] = getEmail
             uid2["name"] = getName
             uid2["mobile"] = getMobile
             uid2["uid"] = clientId
+            uid2["status"] = false
             val chatDocModel = ChatDocModel(
                 uid1 = uid1,
                 uid2 = uid2,
@@ -78,8 +80,10 @@ class UserViewModel: ViewModel() {
             val messageModel = MessageModel(
                 senderUid = authenticationHelper.user!!.uid,
                 msg = messageText,
-                dateTime = currentTime
+                dateTime = currentTime,
+                docId =chatDocModel.uids.toString()
             )
+            Log.d("TAG", "UserViewModel-=-=-=-=-===--====-==--==-==-=$messageModel")
              newChat = repository.sendMessage(clientId, messageModel, chatDocModel)
         }
     }
@@ -88,5 +92,8 @@ class UserViewModel: ViewModel() {
             checkUserLists = repository.checkChatUsers()
         }
         return checkUserLists
+    }
+    fun deleteMessage(docId:String) {
+        return repository.deleteMessage(docId)
     }
 }

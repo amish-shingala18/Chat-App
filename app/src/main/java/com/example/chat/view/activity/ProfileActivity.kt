@@ -1,5 +1,4 @@
 package com.example.chat.view.activity
-
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,7 +9,6 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.chat.MainActivity
 import com.example.chat.R
 import com.example.chat.data.helper.AuthenticationHelper.Companion.authenticationHelper
-import com.example.chat.data.helper.DBHelper.Companion.dbHelper
 import com.example.chat.data.model.UserModel
 import com.example.chat.databinding.ActivityProfileBinding
 import com.example.chat.viewmodel.UserViewModel
@@ -32,11 +30,9 @@ class ProfileActivity : AppCompatActivity() {
         binding.edtProfileEmail.setText(email)
         userViewModel.readUserData()
         userViewModel.liveModel.observe(this) {
-            if (it.firstName!=null) {
-                binding.edtProfileFN.setText(it.firstName)
-                binding.edtProfileLN.setText(it.lastName)
-                binding.edtProfileMN.setText(it.mobile)
-            }
+            binding.edtProfileFN.setText(it.firstName)
+            binding.edtProfileLN.setText(it.lastName)
+            binding.edtProfileMN.setText(it.mobile)
         }
         initClick()
     }

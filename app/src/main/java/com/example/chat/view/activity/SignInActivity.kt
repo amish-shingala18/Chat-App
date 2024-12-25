@@ -43,11 +43,12 @@ class SignInActivity : AppCompatActivity() {
         googleSignIn()
         val registerGoogle = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val googleId = GoogleSignIn.getSignedInAccountFromIntent(it.data)
-            val credential = GoogleAuthProvider.getCredential(googleId.result.idToken, null)
+            val credential = GoogleAuthProvider.getCredential(googleId.result.idToken,null)
             FirebaseAuth.getInstance().signInWithCredential(credential).addOnSuccessListener {
                 authenticationHelper.checkUser()
                 val intent = Intent(this@SignInActivity, ProfileActivity::class.java)
                 intent.putExtra("email", googleId.result.email)
+
                 startActivity(intent)
                 finish()
             }.addOnFailureListener {
